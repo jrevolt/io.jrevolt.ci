@@ -1,0 +1,28 @@
+Usage:
+	--deploy {profiles} {context} {artifact} {options}
+	    Download specified application from Nexus repository and deploy to a configured application server.
+       --profiles={server},{db},{app}
+           server := jboss|tomcat
+           db     := mssql|oracle
+       	 app    := <any>
+       --artifact={groupId}:{artifactId}:{version}:{packaging}
+           Maven URI identifying the resource to be downloaded and deployed
+       --context={contextPath}
+           Context path to deploy the application to. (Note: this is Tomcat-specific, for JBoss, use deployment
+           descriptor.
+       --restart[=(true|false)]
+           If set, application server is restarted after deployment. This may help prevent some memory leaks and
+           issues with PermGen GC.
+       --force[=(true|false)]
+           Forces redeployment. By default, if deployer finds out this version of application si already deployed,
+           redeployment is skipped.
+       --db.update[=(true|false)]
+           Execute database update for Liquibase-enabled applications.
+       --db.update.logLevel=(info|debug)
+           Enabled more detailed logging for Liquibase DB updater (intended for DB update debugging)
+
+	--encrypt --key={name}
+	    Read sensitive information (password) from console or standard input, encrypt it using a key generated
+	    specifically for this installation, and save it in a private secure store.
+	    Password can be referenced in configuration using portable and safe expression: "{secured:name:}".
+

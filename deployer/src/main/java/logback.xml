@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<configuration>
+	<include resource="org/springframework/boot/logging/logback/defaults.xml" />
+	<property name="LOG_CONSOLE" value="${LOG_CONSOLE:-true}"/>
+	<property name="LOG_FILE" value="${user.home}/.deploy/deployer.log"/>
+	<include resource="org/springframework/boot/logging/logback/console-appender.xml" />
+	<include resource="org/springframework/boot/logging/logback/file-appender.xml" />
+	<root level="INFO">
+		<if condition='property("LOG_CONSOLE").equalsIgnoreCase("true")'>
+			<then>
+				<appender-ref ref="CONSOLE" />
+			</then>
+		</if>
+		<appender-ref ref="FILE" />
+	</root>
+
+</configuration>

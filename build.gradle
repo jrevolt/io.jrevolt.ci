@@ -5,10 +5,7 @@ buildscript {
 		jerseyVersion="2.14-SNAPSHOT"
 	}
 	repositories {
-//		mavenLocal()
-		maven { url "$nexusUrl/content/groups/public/";
-			credentials { username="$nexusUser"; password="$nexusPassword"; }
-		}
+		maven { url "$repository"; }
 	}
 	dependencies {
 		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
@@ -19,17 +16,25 @@ ext {
 	branch = "$git rev-parse --abbrev-ref HEAD".execute().in.text.trim()
 	branchShort = branch.replaceFirst(".*/", "")
 	commit = "$git rev-parse HEAD".execute().in.text.trim()
-	commitShort = commit.length() > 7 ? commit.substring(0, 7) : commit
+	commitShort = commit.substring(0, 7)
 	tag = branch.matches("master") ? "$git describe --tags --exact-match".execute().in.text.trim() : null
 	gitDescribe = "$git describe --tags --always --long".execute().in.text.trim()
 	snapshotVersion = "${branchShort}-SNAPSHOT"
 	releaseVersion = tag ? "${tag}-${commitShort}" : null
 }
 
+
+
+allprojects {
+//	distZip.enabled = false
+}
+
 subprojects {
 
 	apply plugin: 'java'
 	apply plugin: 'maven'
+	apply plugin: 'distribution'
+	apply plugin: 'spring-boot'
 
 	group = rootProject.name
 	version = "${releaseVersion ?: snapshotVersion}"
@@ -48,6 +53,7 @@ subprojects {
 
 	dependencies {
 		compile("org.springframework.boot:spring-boot-starter:${springBootVersion}")
+		compile("org.springframework.boot:spring-boot-launcher:${springBootVersion}")
 
 		compile("org.apache.commons:commons-lang3:3.1")
 		compile("commons-io:commons-io:2.4")
@@ -56,21 +62,29 @@ subprojects {
 	}
 
 	repositories {
-//		mavenLocal()
-		maven { url "$nexusUrl/content/groups/public/";
-			credentials { username="$nexusUser"; password="$nexusPassword"; }
+		maven { url "$repository"; }
+	}
+
+	// FIXME QDH don't know yet how to get rid of distZip and distTar artifacts
+	configurations.archives.artifacts.with { archives ->
+		new ArrayList(archives).each {
+			if (it.file.name.matches('.*(zip|tar)$')) {
+				remove(it)
+			}
 		}
 	}
 
 	uploadArchives {
 		repositories {
 			mavenDeployer {
-				repository(url: "$nexusUrl/content/repositories/snapshots") {
-					authentication(userName: "$nexusUser", password: "$nexusPassword")
+				repository(url: releaseVersion ? "$releases" : "$snapshots") {
+					authentication(userName: "$deploymentUserName", password: "$deploymentPassword")
 				}
 			}
 		}
 	}
 }
+
+
 
 

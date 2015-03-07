@@ -1,8 +1,13 @@
 
 buildscript {
 	ext.profile = "${profile}"
-	println "Profile is set to $ext.profile"
-	ext.config = new ConfigSlurper(ext.profile).parse(file('config.groovy').toURL())
+	File f = new File("${project.projectDir}/gradle-${ext.profile}.properties")
+	Properties props = new Properties()
+	if (f.exists()) {
+		println("Loading $f.absolutePath")
+		props.load(f.newDataInputStream())
+	}
+	ext.config = props
 
 	ext {
 		springVersion = "4.1.5.RELEASE"

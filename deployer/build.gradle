@@ -6,11 +6,6 @@ buildscript {
 	}
 }
 
-springBoot {
-	mainClass = "sk.dcom.tools.deployer.Main"
-	layout = "NONE"
-}
-
 dependencies {
 	compile("org.springframework.boot:spring-boot-launcher:${springBootVersion}")
 	compile("org.springframework.boot:spring-boot-starter:${springBootVersion}")

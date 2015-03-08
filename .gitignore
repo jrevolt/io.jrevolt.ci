@@ -5,3 +5,5 @@
 # GRADLE
 /.gradle
 /.build
+/gradle-*.properties
+

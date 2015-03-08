@@ -1,13 +1,12 @@
 
 buildscript {
-	ext.profile = "${profile}"
-	File f = new File("${project.projectDir}/gradle-${ext.profile}.properties")
+	File f = new File("${project.projectDir}/gradle-${profile}.properties")
 	Properties props = new Properties()
 	if (f.exists()) {
 		println("Loading $f.absolutePath")
 		props.load(f.newDataInputStream())
+		for (String s : props.stringPropertyNames()) setProperty(s, props.getProperty(s))
 	}
-	ext.config = props
 
 	ext {
 		springVersion = "4.1.5.RELEASE"
@@ -16,7 +15,7 @@ buildscript {
 	}
 
 	repositories {
-		maven { url "$config.repository"; }
+		maven { url "$repository"; }
 	}
 	dependencies {
 		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
@@ -71,7 +70,7 @@ subprojects {
 	}
 
 	repositories {
-		maven { url "$config.repository"; }
+		maven { url "$repository"; }
 	}
 
 	// FIXME QDH don't know yet how to get rid of distZip and distTar artifacts
@@ -86,8 +85,8 @@ subprojects {
 	uploadArchives {
 		repositories {
 			mavenDeployer {
-				repository(url: releaseVersion ? "$config.releases" : "$config.snapshots") {
-					authentication(userName: "$config.deploymentUserName", password: "$config.deploymentPassword")
+				repository(url: releaseVersion ? "$releases" : "$snapshots") {
+					authentication(userName: "$deploymentUserName", password: "$deploymentPassword")
 				}
 			}
 		}

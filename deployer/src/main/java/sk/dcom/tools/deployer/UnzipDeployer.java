@@ -9,6 +9,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.launcher.mvn.Artifact;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
@@ -32,9 +33,9 @@ public class UnzipDeployer extends Deployer {
 
 
 	@Override
-	void deploy(MvnUri mvnuri, File archive, boolean restart) {
+	void deploy(Artifact artifact, boolean restart) {
 		try {
-			ZipFile zip = new ZipFile(archive);
+			ZipFile zip = new ZipFile(artifact.getFile());
 			Enumeration<? extends ZipEntry> entries = zip.entries();
 			while (entries.hasMoreElements()) {
 				ZipEntry ze = entries.nextElement();

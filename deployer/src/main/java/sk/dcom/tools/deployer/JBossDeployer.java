@@ -11,10 +11,11 @@ import org.jboss.as.controller.client.helpers.standalone.ServerUpdateActionResul
 import org.jboss.dmr.ModelNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import org.springframework.boot.launcher.mvn.Artifact;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.List;
@@ -30,14 +31,14 @@ public class JBossDeployer extends Deployer {
 
 	static private Logger LOG = LoggerFactory.getLogger(JBossDeployer.class);
 
-	void deploy(final MvnUri mvnuri, final File archive, boolean restart) {
+	void deploy(Artifact artifact, boolean restart) {
 
 		ModelControllerClient client = DomainClient.Factory.create(asAddress.getAddress(), asAddress.getPort());
 		ServerDeploymentManager manager = ServerDeploymentManager.Factory.create(client);
 
-		String name = mvnuri.artifactId;
-		String runtimeName = archive.getName();
-		String currentRuntimeName = getCurrentRuntimeName(mvnuri, client);
+		String name = artifact.getArtifactId();
+		String runtimeName = artifact.getFile().getName();
+		String currentRuntimeName = getCurrentRuntimeName(artifact, client);
 
 		DeploymentPlan plan;
 		ServerDeploymentPlanResult result;
@@ -49,7 +50,7 @@ public class JBossDeployer extends Deployer {
 				return;
 			}
 
-			LOG.info("Preparing deployment of {}, name={}, runtimeName={}", mvnuri, name, runtimeName);
+			LOG.info("Preparing deployment of {}, name={}, runtimeName={}", artifact.asString(), name, runtimeName);
 
 
 			LOG.info("Undeploying {}", currentRuntimeName);
@@ -64,17 +65,17 @@ public class JBossDeployer extends Deployer {
 
 			plan = currentRuntimeName != null
 					? manager.newDeploymentPlan()
-							.replace(name, runtimeName, new FileInputStream(archive))
+							.replace(name, runtimeName, new FileInputStream(artifact.getFile()))
 							.deploy(name)
 							.build()
 					: manager.newDeploymentPlan()
-							.add(name, runtimeName, new FileInputStream(archive))
+							.add(name, runtimeName, new FileInputStream(artifact.getFile()))
 							.deploy(name)
 							.build();
 			result = executePlan(manager, plan);
 			report(plan, result);
 
-			currentRuntimeName = getCurrentRuntimeName(mvnuri, client);
+			currentRuntimeName = getCurrentRuntimeName(artifact, client);
 
 			if (StringUtils.equals(runtimeName, currentRuntimeName)) {
 				LOG.info("SUCCESS");
@@ -122,10 +123,10 @@ public class JBossDeployer extends Deployer {
 		}
 	}
 
-	private String getCurrentRuntimeName(MvnUri mvnuri, ModelControllerClient client) {
+	private String getCurrentRuntimeName(Artifact artifact, ModelControllerClient client) {
 		try {
 			ModelNode op = new ModelNode();
-			op.get("address").add("deployment", mvnuri.artifactId);
+			op.get("address").add("deployment", artifact.getArtifactId());
 			op.get("operation").set("read-attribute");
 			op.get("name").set("runtime-name");
 

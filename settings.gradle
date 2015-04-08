@@ -1,6 +1,8 @@
 rootProject.name = 'io.jrevolt.ci'
 
 include 'deployer'
+include 'server'
+include 'swagger'
 
 rootProject.children.each { it.name = "$rootProject.name.$it.name" }
 

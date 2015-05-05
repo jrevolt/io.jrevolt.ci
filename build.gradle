@@ -11,9 +11,9 @@ buildscript {
 	ext.cfg = project.properties
 
 	ext {
-		springVersion = "4.2.0.BUILD-SNAPSHOT"
+		springVersion = "4.1.6.RELEASE"
 		springBootVersion = "1.3.0.BUILD-SNAPSHOT"
-		jerseyVersion="2.14-SNAPSHOT"
+		jerseyVersion="2.17"
 	}
 
 	repositories {

@@ -1,0 +1,23 @@
+ci.gitlab:
+  url:      https://example.com/git
+  username: ci
+  password: UNDEFINED
+
+ci.teamcity:
+  url:      https://example.com/teamcity
+  username: ci
+  password: UNDEFINED
+
+ci:
+  workspace:  ${user.home}/var/io.jrevolt.ci/server
+  bash:       bash
+
+
+---
+spring.profiles: linux
+ci.bash: /bin/bash
+
+---
+spring.profiles: windows
+ci.bash: c:/cygwin/bin/bash.exe
+

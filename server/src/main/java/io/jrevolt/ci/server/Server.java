@@ -1,15 +1,15 @@
 package io.jrevolt.ci.server;
 
+import com.messners.gitlab.api.GitLabApi;
 import com.wordnik.swagger.jaxrs.config.DefaultJaxrsScanner;
 import com.wordnik.swagger.jersey.config.JerseyJaxrsConfig;
 import com.wordnik.swagger.models.Info;
 import com.wordnik.swagger.models.Swagger;
-import org.apache.catalina.filters.CorsFilter;
 import org.glassfish.jersey.servlet.ServletContainer;
 import org.glassfish.jersey.servlet.ServletProperties;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.context.embedded.FilterRegistrationBean;
 import org.springframework.boot.context.embedded.ServletRegistrationBean;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -24,6 +24,7 @@ import javax.servlet.ServletException;
  */
 @Configuration
 @EnableAutoConfiguration
+@EnableConfigurationProperties
 @EnableScheduling
 @EnableWebMvc
 @ComponentScan
@@ -62,6 +63,13 @@ public class Server {
 //        return new FilterRegistrationBean(new CorsFilter());
 //    }
 
+    @Bean
+    GitLabApi gitlab(ServerCfg cfg) {
+        return GitLabApi.create(
+                cfg.getGitlab().getUrl().toExternalForm(),
+                cfg.getGitlab().getUsername(),
+                cfg.getGitlab().getPassword());
+    }
 
 
 }
